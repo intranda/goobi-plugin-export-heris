@@ -1,6 +1,19 @@
 <config_plugin>
- 
-    <!-- sample parameter -->
-    <value>test</value>
+	<!-- 
+	Order of configuration is: 
+	1.) project name matches
+	2.) project is * 
+	-->
 
+	<!-- There could be multiple config blocks. -->
+	<!-- Please make sure that the project names of different config blocks are also different. -->
+	<!-- Given two config blocks with the same project name, the settings of the first one will be taken. -->
+	<config>
+		<project>*</project>
+		<step>*</step>
+        <!-- the name of the process property which contains information of selected images -->
+        <propertyName>plugin_intranda_step_image_selection</propertyName>
+
+
+    </config>
 </config_plugin>
