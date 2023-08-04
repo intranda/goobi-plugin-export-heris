@@ -13,6 +13,7 @@ import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
 import org.goobi.beans.Process;
 import org.goobi.beans.Processproperty;
 import org.goobi.beans.Step;
+import org.goobi.production.cli.helper.StringPair;
 import org.goobi.production.enums.PluginType;
 import org.goobi.production.plugin.interfaces.IExportPlugin;
 import org.goobi.production.plugin.interfaces.IPlugin;
@@ -29,6 +30,7 @@ import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.DocStruct;
 import ugh.dl.Fileformat;
+import ugh.dl.Metadata;
 import ugh.dl.Reference;
 import ugh.exceptions.DocStructHasNoTypeException;
 import ugh.exceptions.MetadataTypeNotAllowedException;
@@ -59,6 +61,10 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
     // name of the Processproperty that holds information of all selected images
     private String propertyName;
 
+    private transient List<JsonField> jsonFields;
+    private String jsonRootElementName;
+    private String herisId;
+
     @Override
     public boolean startExport(Process process) throws IOException, InterruptedException, DocStructHasNoTypeException, PreferencesException,
             WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException, SwapException, DAOException,
@@ -76,6 +82,10 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         // read configuration file
 
         initializeFields(process);
+
+        // TODO open sftp connection, check for previous exports
+
+        // if previous export found, backup files
 
         // open metadata file
 
@@ -108,10 +118,12 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
             // no image selected, abort
             return false;
         }
+
+        //  first one is always the representative
+        boolean isFistImage = true;
         // get photograph docstructs for those imagess
         for (String image : selectedImagesList) {
-            // TODO first one is always the representative ?
-
+            List<StringPair> metadataList = new ArrayList<>();
             for (DocStruct page : pages) {
                 String pageFileName = Paths.get(page.getImageName()).getFileName().toString();
                 DocStruct photograph = null;
@@ -126,24 +138,78 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
                 }
 
                 // collect metadata (default do Document docstruct, if metadata is missing in photograph)
-                if (photograph != null) {
-
+                for (JsonField jsonField : jsonFields) {
+                    String fieldValue = getJsonFieldValue(jsonField, logical, photograph, isFistImage, image);
+                    metadataList.add(new StringPair(jsonField.getName(), fieldValue));
+                    // TODO check if filename was used in previous export. If this is the case, re-use identifier.
                 }
 
+                isFistImage = false;
+
             }
-
         }
-        // create json file
 
-        // open sftp connection, check for previous exports
+        // export images to tmp folder
+        exportSelectedImages(process, selectedImagesList);
+        // create json file in tmp folder
+        writeJsonFile();
+        // upload data via sftp
+        uploadData();
 
-        // if previous export found, backup files
-
-        // check if the same images are used -> re-use identifier
-
-        // export images + json file
+        // finally cleanup tmp folder
 
         return false;
+    }
+
+    private void uploadData() {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void writeJsonFile() {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void exportSelectedImages(Process process, List<String> selectedImagesList) {
+        // TODO Auto-generated method stub
+
+    }
+
+    private String getJsonFieldValue(JsonField jsonField, DocStruct logical, DocStruct photograph, boolean representative, String filename) {
+
+        switch (jsonField.getType()) {
+            case "static":
+                return jsonField.getValue();
+            case "metadata":
+                Metadata md = null;
+                // first get metadat from photograph element
+                if (photograph != null && photograph.getAllMetadata() != null) {
+                    for (Metadata metadata : photograph.getAllMetadata()) {
+                        if (metadata.getType().getName().equals(jsonField.getValue())) {
+                            md = metadata;
+                            break;
+                        }
+                    }
+                }
+                // if this didn't work, get it from main docstruct
+                if (md == null) {
+                    for (Metadata metadata : logical.getAllMetadata()) {
+                        if (metadata.getType().getName().equals(jsonField.getValue())) {
+                            md = metadata;
+                            break;
+                        }
+                    }
+                }
+                return md == null ? "" : md.getValue();
+            case "filename":
+                return filename;
+            case "representative":
+                return String.valueOf(representative);
+            case "identifier":
+            default:
+                return "";
+        }
     }
 
     /**
@@ -156,21 +222,24 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
 
         propertyName = config.getString("./propertyName", "");
 
-        String jsonRootElementName = config.getString("/jsonRootElement");
-        String herisId = config.getString("/herisId");
+        jsonRootElementName = config.getString("/jsonRootElement");
+        herisId = config.getString("/herisId");
+
+        jsonFields = new ArrayList<>();
 
         List<HierarchicalConfiguration> fields = config.configurationsAt("/json_format/field");
 
         for (HierarchicalConfiguration field : fields) {
 
             String jsonName = field.getString("/@name");
-            String value = field.getString(".");
-            String type = field.getString("/@type");
-            System.out.println("######");
-            System.out.println(jsonName);
-            System.out.println(value);
-            System.out.println(type);
+            String jsonValue = field.getString(".");
+            String jsonType = field.getString("/@type");
 
+            JsonField jf = new JsonField();
+            jf.setName(jsonName);
+            jf.setType(jsonType);
+            jf.setValue(jsonValue);
+            jsonFields.add(jf);
         }
 
     }
