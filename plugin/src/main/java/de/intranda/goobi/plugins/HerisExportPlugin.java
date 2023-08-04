@@ -1,6 +1,8 @@
 package de.intranda.goobi.plugins;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -196,7 +198,13 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         jsonObject.put("HERIS-ID", "herisId");
         jsonObject.put(jsonRootElementName, list);
 
-        System.out.println(jsonObject.toString());
+        Path jsonFilePath = Paths.get(tempDir.toString(), herisId + ".json");
+        try (OutputStream out = StorageProvider.getInstance().newOutputStream(jsonFilePath)) {
+            out.write(jsonObject.toString().getBytes(StandardCharsets.UTF_8));
+            out.flush();
+        } catch (IOException e) {
+            log.error(e);
+        }
 
     }
 
