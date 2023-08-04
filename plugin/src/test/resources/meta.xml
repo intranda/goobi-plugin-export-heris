@@ -1,202 +1,192 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mets:mets xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-3.xsd http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/version17/mets.v1-7.xsd http://www.loc.gov/standards/premis/ http://www.loc.gov/standards/premis/v2/premis-v2-0.xsd http://www.loc.gov/standards/mix/ http://www.loc.gov/standards/mix/mix.xsd" xmlns:mets="http://www.loc.gov/METS/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <mets:metsHdr CREATEDATE="2013-01-04T10:18:06">
-        <mets:agent OTHERTYPE="SOFTWARE" ROLE="CREATOR" TYPE="OTHER">
-            <mets:name>Goobi - UGH-1.10-bacb4a7 - 21−August−2012</mets:name>
-            <mets:note>Goobi</mets:note>
-        </mets:agent>
-    </mets:metsHdr>
-    <mets:dmdSec ID="DMDLOG_0000">
-        <mets:mdWrap MDTYPE="MODS">
-            <mets:xmlData>
-                <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
-                    <mods:extension>
-                        <goobi:goobi xmlns:goobi="http://meta.goobi.org/v1.5.1/">
-                            <goobi:metadata name="CreatorsAllOrigin">Klein, Felix</goobi:metadata>
-                            <goobi:metadata name="singleDigCollection">Varia</goobi:metadata>
-                            <goobi:metadata name="singleDigCollection">Digiwunschbuch</goobi:metadata>
-                            <goobi:metadata name="CatalogIDDigital">517154005</goobi:metadata>
-                            <goobi:metadata name="CatalogIDSource">517154005</goobi:metadata>
-                            <goobi:metadata name="TitleDocMain">Universität und Technische Hochschule</goobi:metadata>
-                            <goobi:metadata name="TitleDocMainShort">Universität und Technische Hochschule</goobi:metadata>
-                            <goobi:metadata name="SizeSourcePrint">13 S.</goobi:metadata>
-                            <goobi:metadata name="Author" type="person">
-                                <goobi:lastName>Klein</goobi:lastName>
-                                <goobi:firstName>Felix</goobi:firstName>
-                                <goobi:displayName>Klein, Felix</goobi:displayName>
-                            </goobi:metadata>
-                        </goobi:goobi>
-                    </mods:extension>
-                </mods:mods>
-            </mets:xmlData>
-        </mets:mdWrap>
-    </mets:dmdSec>
-    <mets:dmdSec ID="DMDLOG_0001">
-        <mets:mdWrap MDTYPE="MODS">
-            <mets:xmlData>
-                <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
-                    <mods:extension>
-                        <goobi:goobi xmlns:goobi="http://meta.goobi.org/v1.5.1/">
-                            <goobi:metadata name="TitleDocMain">Hochgeehrte Anwesende!</goobi:metadata>
-                        </goobi:goobi>
-                    </mods:extension>
-                </mods:mods>
-            </mets:xmlData>
-        </mets:mdWrap>
-    </mets:dmdSec>
-    <mets:dmdSec ID="DMDPHYS_0000">
-        <mets:mdWrap MDTYPE="MODS">
-            <mets:xmlData>
-                <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
-                    <mods:extension>
-                        <goobi:goobi xmlns:goobi="http://meta.goobi.org/v1.5.1/">
-                            <goobi:metadata name="pathimagefiles">file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif</goobi:metadata>
-                        </goobi:goobi>
-                    </mods:extension>
-                </mods:mods>
-            </mets:xmlData>
-        </mets:mdWrap>
-    </mets:dmdSec>
-    <mets:fileSec>
-        <mets:fileGrp USE="LOCAL">
-            <mets:file ID="FILE_0000" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000001.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0001" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000002.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0002" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000003.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0003" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000004.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0004" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000005.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0005" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000006.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0006" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000007.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0007" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000008.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0008" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000009.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0009" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000010.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0010" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000011.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0011" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000012.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0012" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000013.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0013" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000014.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0014" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000015.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-            <mets:file ID="FILE_0015" MIMETYPE="image/tiff">
-                <mets:FLocat LOCTYPE="URL" xlink:href="file:///san/goobi/rusdml/Metadaten/1165/images/kleiuniv_PPN517154005_tif/00000016.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
-            </mets:file>
-        </mets:fileGrp>
-    </mets:fileSec>
-    <mets:structMap TYPE="LOGICAL">
-        <mets:div DMDID="DMDLOG_0000" ID="LOG_0000" TYPE="Monograph">
-            <mets:div ID="LOG_0001" TYPE="TitlePage" />
-            <mets:div ID="LOG_0002" TYPE="TitlePage" />
-            <mets:div DMDID="DMDLOG_0001" ID="LOG_0003" TYPE="Chapter" />
-        </mets:div>
-    </mets:structMap>
-    <mets:structMap TYPE="PHYSICAL">
-        <mets:div DMDID="DMDPHYS_0000" ID="PHYS_0000" TYPE="BoundBook">
-            <mets:div ID="PHYS_0001" ORDER="1" ORDERLABEL="uncounted" TYPE="page">
-                <mets:fptr FILEID="FILE_0000" />
-            </mets:div>
-            <mets:div ID="PHYS_0002" ORDER="2" ORDERLABEL="uncounted" TYPE="page">
-                <mets:fptr FILEID="FILE_0001" />
-            </mets:div>
-            <mets:div ID="PHYS_0003" ORDER="3" ORDERLABEL="1" TYPE="page">
-                <mets:fptr FILEID="FILE_0002" />
-            </mets:div>
-            <mets:div ID="PHYS_0004" ORDER="4" ORDERLABEL="2" TYPE="page">
-                <mets:fptr FILEID="FILE_0003" />
-            </mets:div>
-            <mets:div ID="PHYS_0005" ORDER="5" ORDERLABEL="3" TYPE="page">
-                <mets:fptr FILEID="FILE_0004" />
-            </mets:div>
-            <mets:div ID="PHYS_0006" ORDER="6" ORDERLABEL="4" TYPE="page">
-                <mets:fptr FILEID="FILE_0005" />
-            </mets:div>
-            <mets:div ID="PHYS_0007" ORDER="7" ORDERLABEL="5" TYPE="page">
-                <mets:fptr FILEID="FILE_0006" />
-            </mets:div>
-            <mets:div ID="PHYS_0008" ORDER="8" ORDERLABEL="6" TYPE="page">
-                <mets:fptr FILEID="FILE_0007" />
-            </mets:div>
-            <mets:div ID="PHYS_0009" ORDER="9" ORDERLABEL="7" TYPE="page">
-                <mets:fptr FILEID="FILE_0008" />
-            </mets:div>
-            <mets:div ID="PHYS_0010" ORDER="10" ORDERLABEL="8" TYPE="page">
-                <mets:fptr FILEID="FILE_0009" />
-            </mets:div>
-            <mets:div ID="PHYS_0011" ORDER="11" ORDERLABEL="9" TYPE="page">
-                <mets:fptr FILEID="FILE_0010" />
-            </mets:div>
-            <mets:div ID="PHYS_0012" ORDER="12" ORDERLABEL="10" TYPE="page">
-                <mets:fptr FILEID="FILE_0011" />
-            </mets:div>
-            <mets:div ID="PHYS_0013" ORDER="13" ORDERLABEL="11" TYPE="page">
-                <mets:fptr FILEID="FILE_0012" />
-            </mets:div>
-            <mets:div ID="PHYS_0014" ORDER="14" ORDERLABEL="12" TYPE="page">
-                <mets:fptr FILEID="FILE_0013" />
-            </mets:div>
-            <mets:div ID="PHYS_0015" ORDER="15" ORDERLABEL="13" TYPE="page">
-                <mets:fptr FILEID="FILE_0014" />
-            </mets:div>
-            <mets:div ID="PHYS_0016" ORDER="16" ORDERLABEL="14" TYPE="page">
-                <mets:fptr FILEID="FILE_0015" />
-            </mets:div>
-        </mets:div>
-    </mets:structMap>
-    <mets:structLink>
-        <mets:smLink xlink:to="PHYS_0001" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0002" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0003" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0004" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0005" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0006" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0007" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0008" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0009" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0010" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0011" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0012" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0013" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0014" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0015" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0016" xlink:from="LOG_0000" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0001" xlink:from="LOG_0001" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0003" xlink:from="LOG_0002" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0005" xlink:from="LOG_0003" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0006" xlink:from="LOG_0003" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0007" xlink:from="LOG_0003" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0008" xlink:from="LOG_0003" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0009" xlink:from="LOG_0003" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0010" xlink:from="LOG_0003" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0011" xlink:from="LOG_0003" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0012" xlink:from="LOG_0003" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0013" xlink:from="LOG_0003" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0014" xlink:from="LOG_0003" xmlns:xlink="http://www.w3.org/1999/xlink" />
-        <mets:smLink xlink:to="PHYS_0015" xlink:from="LOG_0003" xmlns:xlink="http://www.w3.org/1999/xlink" />
-    </mets:structLink>
+<mets:mets OBJID="" xsi:schemaLocation="http://www.loc.gov/standards/premis/ http://www.loc.gov/standards/premis/v2/premis-v2-0.xsd http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-7.xsd http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd http://www.loc.gov/standards/mix/ http://www.loc.gov/standards/mix/mix.xsd" xmlns:mets="http://www.loc.gov/METS/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:goobi="http://meta.goobi.org/v1.5.1/" xmlns:xlink="http://www.w3.org/1999/xlink">
+   <mets:metsHdr CREATEDATE="2023-07-31T09:46:24Z">
+      <mets:agent OTHERTYPE="SOFTWARE" ROLE="CREATOR" TYPE="OTHER">
+         <mets:name>Goobi -  - 2023-07-07T07:50:46Z</mets:name>
+         <mets:note>Goobi</mets:note>
+      </mets:agent>
+   </mets:metsHdr>
+   <mets:dmdSec ID="DMDLOG_0000">
+      <mets:mdWrap MDTYPE="MODS">
+         <mets:xmlData>
+            <mods:mods>
+               <mods:extension>
+                  <goobi:goobi>
+                     <goobi:metadata name="CatalogIDDigital">1234567890</goobi:metadata>
+                     <goobi:metadata name="TitleDocMain">Wien I, Innere Stadt - Hofburgkomplex</goobi:metadata>
+                     <goobi:metadata name="FederalState">Wien</goobi:metadata>
+                     <goobi:metadata name="HerisID">21</goobi:metadata>
+                     <goobi:metadata name="Series">01</goobi:metadata>
+                     <goobi:metadata name="SubSeries">05</goobi:metadata>
+                     <goobi:metadata name="DMDBID">655</goobi:metadata>
+                     <goobi:metadata name="MainCategory1">Profanbauten</goobi:metadata>
+                     <goobi:metadata name="MainCategory2">Schlösser/Burgen/Palais</goobi:metadata>
+                     <goobi:metadata name="MainCategory3">Schloss</goobi:metadata>
+                     <goobi:metadata name="HerisType">Anlage</goobi:metadata>
+                     <goobi:metadata name="ConstructionTimeFrom">1609</goobi:metadata>
+                     <goobi:metadata name="ConstructionTimeTo">1794</goobi:metadata>
+                     <goobi:metadata name="Published">Ja</goobi:metadata>
+                     <goobi:metadata name="Street">Schloss Hof</goobi:metadata>
+                     <goobi:metadata name="StreetNumber">1</goobi:metadata>
+                     <goobi:metadata name="AdditionalAddressText">bei</goobi:metadata>
+                     <goobi:metadata name="ZIPCode">1010</goobi:metadata>
+                     <goobi:metadata name="Community">Markthof</goobi:metadata>
+                     <goobi:metadata name="CadastralCommune">01004 Innere Stadt</goobi:metadata>
+                     <goobi:metadata name="PoliticalCommunity">Wien</goobi:metadata>
+                     <goobi:metadata name="PoliticalDistrict">Wien(Stadt)</goobi:metadata>
+                     <goobi:metadata name="Country">Österreich</goobi:metadata>
+                     <goobi:metadata name="BDAArea">AT-BDA-FA</goobi:metadata>
+                     <goobi:metadata name="OtherAddress">Rathausplatz 15a, 3400 Klosterneuburg#Schiefergarten 1, 3400 Klosterneuburg#Schiefergarten 2, 3400 Klosterneuburg#Schiefergarten 1, 3400 Klosterneuburg#Stiftsplatz 1, 3400 Klosterneuburg#Stiftsplatz 8, 9, 1 3400 Klosterneuburg#Stiftsplatz 1 u. a. 3400 Klosterneuburg</goobi:metadata>
+                     <goobi:metadata name="Copyright">Bundesdenkmalamt (BDA)</goobi:metadata>
+                  </goobi:goobi>
+               </mods:extension>
+            </mods:mods>
+         </mets:xmlData>
+      </mets:mdWrap>
+   </mets:dmdSec>
+   <mets:dmdSec ID="DMDLOG_0001">
+      <mets:mdWrap MDTYPE="MODS">
+         <mets:xmlData>
+            <mods:mods>
+               <mods:extension>
+                  <goobi:goobi>
+                     <goobi:metadata name="shelfmarksource">AT-BDA-FA-01-05-GZ-001</goobi:metadata>
+                     <goobi:metadata name="TitleDocMain">Wien I, Innere Stadt - Hofburgkomplex</goobi:metadata>
+                  </goobi:goobi>
+               </mods:extension>
+            </mods:mods>
+         </mets:xmlData>
+      </mets:mdWrap>
+   </mets:dmdSec>
+   <mets:dmdSec ID="DMDLOG_0002">
+      <mets:mdWrap MDTYPE="MODS">
+         <mets:xmlData>
+            <mods:mods>
+               <mods:extension>
+                  <goobi:goobi>
+                     <goobi:metadata name="shelfmarksource">AT-BDA-FA-01-05-GZ-002</goobi:metadata>
+                     <goobi:metadata name="TitleDocMain">Wien I, Innere Stadt - Hofburgkomplex</goobi:metadata>
+                  </goobi:goobi>
+               </mods:extension>
+            </mods:mods>
+         </mets:xmlData>
+      </mets:mdWrap>
+   </mets:dmdSec>
+   <mets:dmdSec ID="DMDLOG_0003">
+      <mets:mdWrap MDTYPE="MODS">
+         <mets:xmlData>
+            <mods:mods>
+               <mods:extension>
+                  <goobi:goobi>
+                     <goobi:metadata name="View">Innen</goobi:metadata>
+                     <goobi:metadata name="shelfmarksource">AT-BDA-FA-01-05-GZ-003</goobi:metadata>
+                     <goobi:metadata name="TitleDocMain">Wien I, Innere Stadt - Hofburgkomplex</goobi:metadata>
+                  </goobi:goobi>
+               </mods:extension>
+            </mods:mods>
+         </mets:xmlData>
+      </mets:mdWrap>
+   </mets:dmdSec>
+   <mets:dmdSec ID="DMDLOG_0004">
+      <mets:mdWrap MDTYPE="MODS">
+         <mets:xmlData>
+            <mods:mods>
+               <mods:extension>
+                  <goobi:goobi>
+                     <goobi:metadata name="View">Außen</goobi:metadata>
+                     <goobi:metadata name="shelfmarksource">AT-BDA-FA-01-05-GZ-004</goobi:metadata>
+                     <goobi:metadata name="TitleDocMain">Wien I, Innere Stadt - Hofburgkomplex</goobi:metadata>
+                  </goobi:goobi>
+               </mods:extension>
+            </mods:mods>
+         </mets:xmlData>
+      </mets:mdWrap>
+   </mets:dmdSec>
+   <mets:dmdSec ID="DMDLOG_0005">
+      <mets:mdWrap MDTYPE="MODS">
+         <mets:xmlData>
+            <mods:mods>
+               <mods:extension>
+                  <goobi:goobi>
+                     <goobi:metadata name="View">Innen</goobi:metadata>
+                     <goobi:metadata name="shelfmarksource">AT-BDA-FA-01-05-GZ-005</goobi:metadata>
+                     <goobi:metadata name="TitleDocMain">Wien I, Innere Stadt - Hofburgkomplex</goobi:metadata>
+                  </goobi:goobi>
+               </mods:extension>
+            </mods:mods>
+         </mets:xmlData>
+      </mets:mdWrap>
+   </mets:dmdSec>
+   <mets:dmdSec ID="DMDPHYS_0000">
+      <mets:mdWrap MDTYPE="MODS">
+         <mets:xmlData>
+            <mods:mods>
+               <mods:extension>
+                  <goobi:goobi>
+                     <goobi:metadata name="pathimagefiles">file:///opt/digiverso/goobi/metadata/145/images/bkatest_tif</goobi:metadata>
+                  </goobi:goobi>
+               </mods:extension>
+            </mods:mods>
+         </mets:xmlData>
+      </mets:mdWrap>
+   </mets:dmdSec>
+   <mets:fileSec>
+      <mets:fileGrp USE="LOCAL">
+         <mets:file ID="FILE_0001" MIMETYPE="image/tiff">
+            <mets:FLocat LOCTYPE="URL" xlink:href="file:///opt/digiverso/goobi/metadata/145/images/bkatest_media/Sammelmappe1.pdf_Seite_007.tif"/>
+         </mets:file>
+         <mets:file ID="FILE_0002" MIMETYPE="image/tiff">
+            <mets:FLocat LOCTYPE="URL" xlink:href="file:///opt/digiverso/goobi/metadata/145/images/bkatest_media/Sammelmappe1.pdf_Seite_008.tif"/>
+         </mets:file>
+         <mets:file ID="FILE_0003" MIMETYPE="image/tiff">
+            <mets:FLocat LOCTYPE="URL" xlink:href="file:///opt/digiverso/goobi/metadata/145/images/bkatest_media/Sammelmappe1.pdf_Seite_009.tif"/>
+         </mets:file>
+         <mets:file ID="FILE_0004" MIMETYPE="image/tiff">
+            <mets:FLocat LOCTYPE="URL" xlink:href="file:///opt/digiverso/goobi/metadata/145/images/bkatest_media/Sammelmappe1.pdf_Seite_010.tif"/>
+         </mets:file>
+         <mets:file ID="FILE_0005" MIMETYPE="image/tiff">
+            <mets:FLocat LOCTYPE="URL" xlink:href="file:///opt/digiverso/goobi/metadata/145/images/bkatest_media/Sammelmappe1.pdf_Seite_011.tif"/>
+         </mets:file>
+      </mets:fileGrp>
+   </mets:fileSec>
+   <mets:structMap TYPE="LOGICAL">
+      <mets:div DMDID="DMDLOG_0000" ID="LOG_0000" TYPE="Document">
+         <mets:div DMDID="DMDLOG_0001" ID="LOG_0001" TYPE="Photograph"/>
+         <mets:div DMDID="DMDLOG_0002" ID="LOG_0002" TYPE="Photograph"/>
+         <mets:div DMDID="DMDLOG_0003" ID="LOG_0003" TYPE="Photograph"/>
+         <mets:div DMDID="DMDLOG_0004" ID="LOG_0004" TYPE="Photograph"/>
+         <mets:div DMDID="DMDLOG_0005" ID="LOG_0005" TYPE="Photograph"/>
+      </mets:div>
+   </mets:structMap>
+   <mets:structMap TYPE="PHYSICAL">
+      <mets:div DMDID="DMDPHYS_0000" ID="PHYS_0000" TYPE="BoundBook">
+         <mets:div ID="PHYS_0001" ORDER="1" ORDERLABEL="uncounted" TYPE="page">
+            <mets:fptr FILEID="FILE_0001"/>
+         </mets:div>
+         <mets:div ID="PHYS_0002" ORDER="2" ORDERLABEL="uncounted" TYPE="page">
+            <mets:fptr FILEID="FILE_0002"/>
+         </mets:div>
+         <mets:div ID="PHYS_0003" ORDER="3" ORDERLABEL="uncounted" TYPE="page">
+            <mets:fptr FILEID="FILE_0003"/>
+         </mets:div>
+         <mets:div ID="PHYS_0004" ORDER="4" ORDERLABEL="uncounted" TYPE="page">
+            <mets:fptr FILEID="FILE_0004"/>
+         </mets:div>
+         <mets:div ID="PHYS_0005" ORDER="5" ORDERLABEL="uncounted" TYPE="page">
+            <mets:fptr FILEID="FILE_0005"/>
+         </mets:div>
+      </mets:div>
+   </mets:structMap>
+   <mets:structLink>
+      <mets:smLink xlink:to="PHYS_0001" xlink:from="LOG_0000"/>
+      <mets:smLink xlink:to="PHYS_0002" xlink:from="LOG_0000"/>
+      <mets:smLink xlink:to="PHYS_0003" xlink:from="LOG_0000"/>
+      <mets:smLink xlink:to="PHYS_0004" xlink:from="LOG_0000"/>
+      <mets:smLink xlink:to="PHYS_0005" xlink:from="LOG_0000"/>
+      <mets:smLink xlink:to="PHYS_0001" xlink:from="LOG_0001"/>
+      <mets:smLink xlink:to="PHYS_0002" xlink:from="LOG_0002"/>
+      <mets:smLink xlink:to="PHYS_0003" xlink:from="LOG_0003"/>
+      <mets:smLink xlink:to="PHYS_0004" xlink:from="LOG_0004"/>
+      <mets:smLink xlink:to="PHYS_0005" xlink:from="LOG_0005"/>
+   </mets:structLink>
 </mets:mets>

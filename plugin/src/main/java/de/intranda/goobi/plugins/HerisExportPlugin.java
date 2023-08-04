@@ -10,6 +10,7 @@ import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
+import org.apache.commons.lang.StringUtils;
 import org.goobi.beans.Process;
 import org.goobi.beans.Processproperty;
 import org.goobi.beans.Step;
@@ -82,17 +83,26 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         // read configuration file
 
         initializeFields(process);
+        // open metadata file
+        Fileformat fileformat = process.readMetadataFile();
+        DocStruct logical = fileformat.getDigitalDocument().getLogicalDocStruct();
+        List<DocStruct> pages = fileformat.getDigitalDocument().getPhysicalDocStruct().getAllChildren();
+
+        // get heris id
+        String herisId = null;
+        for (Metadata md : logical.getAllMetadata()) {
+            if ("HerisID".equals(md.getType().getName())) {
+                herisId = md.getValue();
+            }
+        }
+        if (StringUtils.isBlank(herisId)) {
+            // TODO error message
+            return false;
+        }
 
         // TODO open sftp connection, check for previous exports
 
-        // if previous export found, backup files
-
-        // open metadata file
-
-        Fileformat fileformat = process.readMetadataFile();
-
-        DocStruct logical = fileformat.getDigitalDocument().getLogicalDocStruct();
-        List<DocStruct> pages = fileformat.getDigitalDocument().getPhysicalDocStruct().getAllChildren();
+        // if previous export found, backup files, download older json file
 
         // find the images to export
         List<String> selectedImagesList = new ArrayList<>();
@@ -172,6 +182,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
     }
 
     private void exportSelectedImages(Process process, List<String> selectedImagesList) {
+
         // TODO Auto-generated method stub
 
     }
