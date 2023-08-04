@@ -1,9 +1,13 @@
 package de.intranda.goobi.plugins;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
@@ -14,12 +18,13 @@ import org.apache.commons.lang.StringUtils;
 import org.goobi.beans.Process;
 import org.goobi.beans.Processproperty;
 import org.goobi.beans.Step;
-import org.goobi.production.cli.helper.StringPair;
 import org.goobi.production.enums.PluginType;
 import org.goobi.production.plugin.interfaces.IExportPlugin;
 import org.goobi.production.plugin.interfaces.IPlugin;
+import org.json.JSONObject;
 
 import de.sub.goobi.config.ConfigPlugins;
+import de.sub.goobi.helper.StorageProvider;
 import de.sub.goobi.helper.exceptions.DAOException;
 import de.sub.goobi.helper.exceptions.ExportFileException;
 import de.sub.goobi.helper.exceptions.SwapException;
@@ -132,8 +137,9 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         //  first one is always the representative
         boolean isFistImage = true;
         // get photograph docstructs for those imagess
+        List<Map<String, String>> metadataList = new ArrayList<>();
         for (String image : selectedImagesList) {
-            List<StringPair> metadataList = new ArrayList<>();
+            Map<String, String> metadata = new HashMap<>();
             for (DocStruct page : pages) {
                 String pageFileName = Paths.get(page.getImageName()).getFileName().toString();
                 DocStruct photograph = null;
@@ -150,41 +156,61 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
                 // collect metadata (default do Document docstruct, if metadata is missing in photograph)
                 for (JsonField jsonField : jsonFields) {
                     String fieldValue = getJsonFieldValue(jsonField, logical, photograph, isFistImage, image);
-                    metadataList.add(new StringPair(jsonField.getName(), fieldValue));
+                    metadata.put(jsonField.getName(), fieldValue);
                     // TODO check if filename was used in previous export. If this is the case, re-use identifier.
                 }
-
+                metadataList.add(metadata);
                 isFistImage = false;
 
             }
         }
 
-        // export images to tmp folder
-        exportSelectedImages(process, selectedImagesList);
-        // create json file in tmp folder
-        writeJsonFile();
-        // upload data via sftp
-        uploadData();
+        Path tempDir = Files.createTempDirectory(herisId);
 
-        // finally cleanup tmp folder
+        // export images to tmp folder
+        exportSelectedImagesToTempFolder(process, selectedImagesList, tempDir);
+        // create json file in tmp folder
+        writeJsonFile(tempDir, metadataList, herisId);
+        // upload data via sftp
+        uploadData(tempDir);
+
+        // finally delete tmp folder
+        StorageProvider.getInstance().deleteDir(tempDir);
 
         return false;
     }
 
-    private void uploadData() {
+    private void uploadData(Path tempDir) {
         // TODO Auto-generated method stub
 
     }
 
-    private void writeJsonFile() {
-        // TODO Auto-generated method stub
+    private void writeJsonFile(Path tempDir, List<Map<String, String>> metadataList, String herisId) {
+        JSONObject jsonObject = new JSONObject();
+
+        List<JSONObject> list = new ArrayList<>();
+        for (Map<String, String> map : metadataList) {
+            JSONObject jo = new JSONObject(map);
+            list.add(jo);
+        }
+        jsonObject.put("HERIS-ID", "herisId");
+        jsonObject.put(jsonRootElementName, list);
+
+        System.out.println(jsonObject.toString());
 
     }
 
-    private void exportSelectedImages(Process process, List<String> selectedImagesList) {
-
-        // TODO Auto-generated method stub
-
+    private void exportSelectedImagesToTempFolder(Process process, List<String> imagesList, Path tempDir) {
+        try {
+            String imageFolder = process.getImagesTifDirectory(false);
+            for (String imagename : imagesList) {
+                Path source = Paths.get(imageFolder, imagename);
+                Path destination = Paths.get(tempDir.toString(), imagename);
+                StorageProvider.getInstance().copyFile(source, destination);
+            }
+        } catch (IOException | SwapException e) {
+            log.error(e);
+        }
     }
 
     private String getJsonFieldValue(JsonField jsonField, DocStruct logical, DocStruct photograph, boolean representative, String filename) {
