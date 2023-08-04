@@ -1,11 +1,15 @@
 package de.intranda.goobi.plugins;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration.SubnodeConfiguration;
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
+import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
 import org.goobi.beans.Process;
 import org.goobi.beans.Processproperty;
 import org.goobi.beans.Step;
@@ -13,6 +17,7 @@ import org.goobi.production.enums.PluginType;
 import org.goobi.production.plugin.interfaces.IExportPlugin;
 import org.goobi.production.plugin.interfaces.IPlugin;
 
+import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.helper.exceptions.DAOException;
 import de.sub.goobi.helper.exceptions.ExportFileException;
 import de.sub.goobi.helper.exceptions.SwapException;
@@ -56,19 +61,21 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
 
     @Override
     public boolean startExport(Process process) throws IOException, InterruptedException, DocStructHasNoTypeException, PreferencesException,
-    WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException, SwapException, DAOException,
-    TypeNotAllowedForParentException {
+            WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException, SwapException, DAOException,
+            TypeNotAllowedForParentException {
 
         return startExport(process, null);
     }
 
     @Override
     public boolean startExport(Process process, String destination) throws IOException, InterruptedException, DocStructHasNoTypeException,
-    PreferencesException, WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException,
-    SwapException, DAOException, TypeNotAllowedForParentException {
+            PreferencesException, WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException,
+            SwapException, DAOException, TypeNotAllowedForParentException {
         problems = new ArrayList<>();
 
         // read configuration file
+
+        initializeFields(process);
 
         // open metadata file
 
@@ -78,7 +85,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         List<DocStruct> pages = fileformat.getDigitalDocument().getPhysicalDocStruct().getAllChildren();
 
         // find the images to export
-        Map<Integer, String> selectedImagesNamesOrderMap = new HashMap<>();
+        List<String> selectedImagesList = new ArrayList<>();
         Processproperty property = getProcessproperty(process);
         if (property != null) {
             String propertyValue = property.getWert();
@@ -90,28 +97,39 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
                 String[] itemParts = item.split(":");
                 String imageName = itemParts[0];
                 // remove " from both ends
-                int imageOrder = Integer.parseInt(itemParts[1]);
-                selectedImagesNamesOrderMap.put(imageOrder, imageName);
+                String reducedImageName = imageName.substring(1, imageName.length() - 1);
+                selectedImagesList.add(reducedImageName);
             }
         } else {
             // property not set, abort
             return false;
         }
-        if (selectedImagesNamesOrderMap.isEmpty()) {
+        if (selectedImagesList.isEmpty()) {
             // no image selected, abort
             return false;
         }
         // get photograph docstructs for those imagess
-        for (int i = 0; i < selectedImagesNamesOrderMap.size(); i++) {
-            String image = selectedImagesNamesOrderMap.get(i);
-
-            // collect metadata (default do Document docstruct, if metadata is missing)
+        for (String image : selectedImagesList) {
+            // TODO first one is always the representative ?
 
             for (DocStruct page : pages) {
-                // TODO comparison to filename only
-                if (page.getImageName().equals(image)) {
-                    List<Reference> refs = page.getAllToReferences();
+                String pageFileName = Paths.get(page.getImageName()).getFileName().toString();
+                DocStruct photograph = null;
+                // comparison with filenames only
+                if (pageFileName.equals(image)) {
+                    List<Reference> refs = page.getAllFromReferences();
+                    for (Reference ref : refs) {
+                        if ("Photograph".equals(ref.getSource().getType().getName())) {
+                            photograph = ref.getSource();
+                        }
+                    }
                 }
+
+                // collect metadata (default do Document docstruct, if metadata is missing in photograph)
+                if (photograph != null) {
+
+                }
+
             }
 
         }
@@ -126,6 +144,35 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         // export images + json file
 
         return false;
+    }
+
+    /**
+     * initialize private fields
+     * 
+     * @param process Goobi process
+     */
+    private void initializeFields(Process process) {
+        SubnodeConfiguration config = getConfig(process);
+
+        propertyName = config.getString("./propertyName", "");
+
+        String jsonRootElementName = config.getString("/jsonRootElement");
+        String herisId = config.getString("/herisId");
+
+        List<HierarchicalConfiguration> fields = config.configurationsAt("/json_format/field");
+
+        for (HierarchicalConfiguration field : fields) {
+
+            String jsonName = field.getString("/@name");
+            String value = field.getString(".");
+            String type = field.getString("/@type");
+            System.out.println("######");
+            System.out.println(jsonName);
+            System.out.println(value);
+            System.out.println(type);
+
+        }
+
     }
 
     /**
@@ -147,4 +194,40 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         return null;
     }
 
+    /**
+     * get the SubnodeConfiguration of the current process
+     * 
+     * @param process Goobi process
+     * @return SubnodeConfiguration object according to the project's name
+     */
+    private SubnodeConfiguration getConfig(Process process) {
+        String projectName = process.getProjekt().getTitel();
+        log.debug("projectName = " + projectName);
+        XMLConfiguration xmlConfig = getXMLConfig();
+        SubnodeConfiguration conf = null;
+
+        // order of configuration is:
+        // 1.) project name matches
+        // 2.) project is *
+        try {
+            conf = xmlConfig.configurationAt("//config[./project = '" + projectName + "']");
+        } catch (IllegalArgumentException e) {
+            conf = xmlConfig.configurationAt("//config[./project = '*']");
+        }
+
+        return conf;
+    }
+
+    /**
+     * get the XML configuration of this plugin
+     * 
+     * @return the XMLConfiguration of this plugin
+     */
+    private XMLConfiguration getXMLConfig() {
+        XMLConfiguration xmlConfig = ConfigPlugins.getPluginConfig(title);
+        xmlConfig.setExpressionEngine(new XPathExpressionEngine());
+        xmlConfig.setReloadingStrategy(new FileChangedReloadingStrategy());
+
+        return xmlConfig;
+    }
 }

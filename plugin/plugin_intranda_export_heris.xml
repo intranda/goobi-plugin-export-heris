@@ -15,5 +15,21 @@
         <propertyName>plugin_intranda_step_image_selection</propertyName>
 
 
+        <jsonRootElement>Bilder</jsonRootElement>
+        <herisId>HERIS-ID</herisId>
+        <!-- configure here the default settings for the JSON format -->
+        <json_format>
+            <field type="identifier" name="Id"><!-- TODO re-use old existing id, leave it blank, generate new id?, use shelfmark? --></field>
+            <field type="metadata" name="Titel">TitleDocMain</field>
+            <field type="metadata" name="alt_text">TitleDocMain</field>
+            <field type="boolean" name="Symbolbild"><!-- TODO first selected image --></field>
+            <field type="extension" name="media_type">JPEG</field>
+            <field type="metadata" name="Aufnahmedatum">DateRecorded</field>
+            <field type="metadata" name="Copyright BDA">Copyright</field>
+            <field type="filename" name="Dateiinformation"><!-- TODO -->filename</field>
+            <field type="metadata" name="publikationsfähig">Published</field>
+            <field type="metadata" name="Migrierte Information"><!-- TODO --></field>
+        </json_format>
+
     </config>
 </config_plugin>
