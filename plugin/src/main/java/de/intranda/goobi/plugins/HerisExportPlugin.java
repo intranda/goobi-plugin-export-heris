@@ -454,8 +454,13 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
     }
 
     private void uploadData() {
-        // TODO: create a backup file, if previous json file exists
-        // TODO Auto-generated method stub
+
+        // TODO
+        // create new remote folder, if missing
+        // list all files in remote folder
+        // compare filenames with new files
+        // if remote file is not present in local folder, delete it
+        // upload new images + json + backup file
 
     }
 

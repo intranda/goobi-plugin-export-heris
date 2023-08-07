@@ -30,9 +30,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.easymock.EasyMock;
 import org.goobi.beans.Process;
 import org.goobi.beans.Processproperty;
@@ -58,6 +55,8 @@ import de.sub.goobi.metadaten.MetadatenHelper;
 @PrepareForTest({ MetadatenHelper.class, VariableReplacer.class, ConfigurationHelper.class })
 @PowerMockIgnore({ "javax.management.*", "javax.net.ssl.*", "jdk.internal.reflect.*" })
 public class HerisExportPluginTest {
+
+    private static final String RULESET_NAME = "ruleset.xml";
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -158,24 +157,7 @@ public class HerisExportPluginTest {
         assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_009.tif")));
         assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_010.tif")));
         assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_011.tif")));
-
-        // open json file, check content
-
     }
-
-    private XMLConfiguration getConfig() {
-        String file = "plugin_intranda_export_heris.xml";
-        XMLConfiguration config = new XMLConfiguration();
-        config.setDelimiterParsingDisabled(true);
-        try {
-            config.load(resourcesFolder + file);
-        } catch (ConfigurationException e) {
-        }
-        config.setReloadingStrategy(new FileChangedReloadingStrategy());
-        return config;
-    }
-
-    private static final String RULESET_NAME = "ruleset.xml";
 
     public static Process createProcess() throws Exception {
 
