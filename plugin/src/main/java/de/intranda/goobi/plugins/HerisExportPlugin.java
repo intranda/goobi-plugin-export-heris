@@ -1,7 +1,27 @@
+/**
+ * This file is part of the Goobi Application - a Workflow tool for the support of mass digitization.
+ * 
+ * Visit the websites for more information.
+ *          - https://goobi.io
+ *          - https://www.intranda.com
+ *          - https://github.com/intranda/goobi-workflow
+ * 
+ * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59
+ * Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 package de.intranda.goobi.plugins;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +36,7 @@ import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.goobi.beans.Process;
 import org.goobi.beans.Processproperty;
@@ -23,14 +44,17 @@ import org.goobi.beans.Step;
 import org.goobi.production.enums.PluginType;
 import org.goobi.production.plugin.interfaces.IExportPlugin;
 import org.goobi.production.plugin.interfaces.IPlugin;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.sub.goobi.config.ConfigPlugins;
+import de.sub.goobi.helper.Helper;
 import de.sub.goobi.helper.StorageProvider;
 import de.sub.goobi.helper.exceptions.DAOException;
 import de.sub.goobi.helper.exceptions.ExportFileException;
 import de.sub.goobi.helper.exceptions.SwapException;
 import de.sub.goobi.helper.exceptions.UghHelperException;
+import io.goobi.workflow.api.connection.SftpUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -74,7 +98,18 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
     // set this to false in order to keep temp files (for junit tests)
     private boolean cleanupTempFiles = true;
 
-    private Path tempDir;
+    private transient Path tempDir;
+
+    // sftp connection
+    boolean useSftp = false;
+    private String username;
+    private String password;
+    private String keyfile;
+    private String hostname;
+    private String knownHosts;
+    private String ftpFolder;
+    private int port = 22;
+    private transient SftpUtils utils = null;
 
     @Override
     public boolean startExport(Process process) throws IOException, InterruptedException, DocStructHasNoTypeException, PreferencesException,
@@ -91,8 +126,8 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         problems = new ArrayList<>();
 
         // read configuration file
+        readConfiguration(process);
 
-        initializeFields(process);
         // open metadata file
         Fileformat fileformat = process.readMetadataFile();
         DocStruct logical = fileformat.getDigitalDocument().getLogicalDocStruct();
@@ -107,14 +142,9 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
             }
         }
         if (StringUtils.isBlank(herisId)) {
-            // TODO error message
+            Helper.setFehlerMeldung("The record doesn't contain a HERIS ID, abort");
             return false;
         }
-
-        // TODO open sftp connection, check for previous exports
-
-        // if previous export found, backup files, download older json file
-        // filename + id list
 
         // find the images to export
         List<String> selectedImagesList = new ArrayList<>();
@@ -139,12 +169,44 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
                 selectedImagesList.add(reducedImageName);
             }
         } else {
+            Helper.setFehlerMeldung("The record has no images selected, abort");
             // property not set, abort
             return false;
         }
         if (selectedImagesList.isEmpty()) {
             // no image selected, abort
+            Helper.setFehlerMeldung("The record has no images selected, abort");
             return false;
+        }
+
+        tempDir = Files.createTempDirectory(herisId);
+
+        //  open sftp connection,
+        connect();
+        // search for previous entry
+        Path previousData = getExistingJsonFile(herisId);
+
+        Map<String, String> imageIdentifierMap = new HashMap<>();
+        if (previousData != null) {
+            // parse file, generate filename + identifier list
+            InputStream is = StorageProvider.getInstance().newInputStream(previousData);
+            String jsonTxt = IOUtils.toString(is, Charset.defaultCharset());
+
+            JSONObject json = new JSONObject(jsonTxt);
+
+            JSONArray images = json.getJSONArray(jsonRootElementName);
+
+            for (Object imageObject : images) {
+                JSONObject image = (JSONObject) imageObject;
+                String filename = image.getString("Dateiinformation");
+                String identifier = image.getString("Id");
+                imageIdentifierMap.put(filename, identifier);
+            }
+
+            // rename file
+            Path backupFile =
+                    Paths.get(previousData.getParent().toString(), previousData.getFileName().toString() + "-" + System.currentTimeMillis());
+            Files.move(previousData, backupFile);
         }
 
         //  first one is always the representative
@@ -169,7 +231,12 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
                     for (JsonField jsonField : jsonFields) {
                         String fieldValue = getJsonFieldValue(jsonField, logical, photograph, isFistImage, image);
                         metadata.put(jsonField.getName(), fieldValue);
-                        // TODO check if filename was used in previous export. If this is the case, re-use identifier.
+
+                        // if filename was used in previous export, re-use identifier. Otherwise identifier field is blank
+                        if ("identifier".equals(jsonField.getType())) {
+                            metadata.put(jsonField.getName(), imageIdentifierMap.get(image));
+                        }
+
                     }
                     metadataList.add(metadata);
                     isFistImage = false;
@@ -177,8 +244,6 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
 
             }
         }
-
-        tempDir = Files.createTempDirectory(herisId);
 
         // export images to tmp folder
         exportSelectedImagesToTempFolder(process, selectedImagesList);
@@ -191,13 +256,8 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         if (cleanupTempFiles) {
             StorageProvider.getInstance().deleteDir(tempDir);
         }
-
+        disconnect();
         return true;
-    }
-
-    private void uploadData() {
-        // TODO Auto-generated method stub
-
     }
 
     private void writeJsonFile(List<Map<String, String>> metadataList, String herisId) {
@@ -274,7 +334,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
      * 
      * @param process Goobi process
      */
-    private void initializeFields(Process process) {
+    private void readConfiguration(Process process) {
         SubnodeConfiguration config = getConfig(process);
 
         propertyName = config.getString("./propertyName", "");
@@ -297,6 +357,15 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
             jf.setValue(jsonValue);
             jsonFields.add(jf);
         }
+
+        useSftp = config.getBoolean("/sftp/@use", false);
+        username = config.getString("/sftp/username");
+        password = config.getString("/sftp/password");
+        hostname = config.getString("/sftp/hostname");
+        port = config.getInt("/sftp/port", 22);
+        keyfile = config.getString("/sftp/keyfile");
+        knownHosts = config.getString("/sftp/knownHosts", System.getProperty("user.home").concat("/.ssh/known_hosts"));
+        ftpFolder = config.getString("/sftp/sftpFolder");
 
     }
 
@@ -336,4 +405,64 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
 
         return xmlConfig;
     }
+
+    private void connect() {
+        if (useSftp) {
+            try {
+                // first option, use passphrase protected keyfile
+                if (StringUtils.isNotBlank(keyfile) && StringUtils.isNotBlank(password)) {
+                    utils = new SftpUtils(username, keyfile, password, hostname, port, knownHosts);
+                }
+                // second option: use keyfile without passphrase
+                else if (StringUtils.isNotBlank(keyfile)) {
+                    utils = new SftpUtils(username, keyfile, null, hostname, port, knownHosts);
+                }
+                // third option, username + password
+                else {
+                    utils = new SftpUtils(username, password, hostname, port, knownHosts);
+                }
+            } catch (IOException e) {
+                log.error(e);
+            }
+        }
+    }
+
+    private Path getExistingJsonFile(String herisId) {
+        Path jsonFile = null;
+        if (useSftp) {
+            try {
+                // open configured folder
+                utils.changeRemoteFolder(ftpFolder);
+
+                // check for existing data in previous exports
+                utils.changeRemoteFolder(herisId);
+                List<String> dataInFolder = utils.listContent();
+
+                // download existing data
+                if (!dataInFolder.isEmpty()) {
+                    for (String filename : dataInFolder) {
+                        if ((herisId + ".json").equals(filename)) {
+                            jsonFile = utils.downloadFile(filename, tempDir);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                // exception is thrown if the given file does not exist
+            }
+        }
+        return jsonFile;
+    }
+
+    private void uploadData() {
+        // TODO: create a backup file, if previous json file exists
+        // TODO Auto-generated method stub
+
+    }
+
+    private void disconnect() {
+        if (utils != null) {
+            utils.close();
+        }
+    }
+
 }

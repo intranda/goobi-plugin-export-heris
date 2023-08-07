@@ -28,5 +28,44 @@
             <field type="metadata" name="Migrierte Information"><!-- TODO --></field>
         </json_format>
 
+
+        <!-- sftp credentials for username + password authentication -->
+        <!-- 
+        <sftp use="true">
+            <username>username</username>
+            <password>password</password>
+            <hostname>localhost</hostname>
+            <knownHosts>~/.ssh/known_hosts</knownHosts>
+            <sftpFolder>/path/to/remote/folder/</sftpFolder>
+            <port>22</port>
+        </sftp>
+        -->
+
+        <!-- sftp credentials for username + public/private key authentication -->
+        <!-- 
+        <sftp use="true">
+            <username>username</username>
+            <keyfile>/path/to/private/key</keyfile>
+            <hostname>localhost</hostname>
+            <knownHosts>~/.ssh/known_hosts</knownHosts>
+            <sftpFolder>/path/to/remote/folder/</sftpFolder>
+            <port>22</port>
+        </sftp> 
+        -->
+
+        <!-- sftp credentials for password protected public/private key authentication -->
+        <!-- 
+        <sftp use="true">
+            <username>username</username>
+            <keyfile>/path/to/private/key</keyfile>
+            <password>password</password>
+            <hostname>localhost</hostname>
+            <knownHosts>~/.ssh/known_hosts</knownHosts>
+            <sftpFolder>/path/to/remote/folder/</sftpFolder>
+            <port>22</port>
+        </sftp> 
+        -->
+
+
     </config>
 </config_plugin>
