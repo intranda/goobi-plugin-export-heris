@@ -31,7 +31,6 @@ import de.sub.goobi.helper.exceptions.DAOException;
 import de.sub.goobi.helper.exceptions.ExportFileException;
 import de.sub.goobi.helper.exceptions.SwapException;
 import de.sub.goobi.helper.exceptions.UghHelperException;
-import de.sub.goobi.persistence.managers.PropertyManager;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -71,7 +70,11 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
 
     private transient List<JsonField> jsonFields;
     private String jsonRootElementName;
-    private String herisId;
+
+    // set this to false in order to keep temp files (for junit tests)
+    private boolean cleanupTempFiles = true;
+
+    private Path tempDir;
 
     @Override
     public boolean startExport(Process process) throws IOException, InterruptedException, DocStructHasNoTypeException, PreferencesException,
@@ -100,6 +103,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         for (Metadata md : logical.getAllMetadata()) {
             if ("HerisID".equals(md.getType().getName())) {
                 herisId = md.getValue();
+                break;
             }
         }
         if (StringUtils.isBlank(herisId)) {
@@ -110,10 +114,17 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         // TODO open sftp connection, check for previous exports
 
         // if previous export found, backup files, download older json file
+        // filename + id list
 
         // find the images to export
         List<String> selectedImagesList = new ArrayList<>();
-        Processproperty property = getProcessproperty(process);
+        Processproperty property = null;
+        for (Processproperty p : process.getEigenschaften()) {
+            if (propertyName.equals(p.getTitel())) {
+                property = p;
+                break;
+            }
+        }
         if (property != null) {
             String propertyValue = property.getWert();
             log.debug("propertyValue = " + propertyValue);
@@ -144,50 +155,52 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
             Map<String, String> metadata = new HashMap<>();
             for (DocStruct page : pages) {
                 String pageFileName = Paths.get(page.getImageName()).getFileName().toString();
-                DocStruct photograph = null;
                 // comparison with filenames only
                 if (pageFileName.equals(image)) {
+                    DocStruct photograph = null;
                     List<Reference> refs = page.getAllFromReferences();
                     for (Reference ref : refs) {
                         if ("Photograph".equals(ref.getSource().getType().getName())) {
                             photograph = ref.getSource();
                         }
                     }
-                }
 
-                // collect metadata (default do Document docstruct, if metadata is missing in photograph)
-                for (JsonField jsonField : jsonFields) {
-                    String fieldValue = getJsonFieldValue(jsonField, logical, photograph, isFistImage, image);
-                    metadata.put(jsonField.getName(), fieldValue);
-                    // TODO check if filename was used in previous export. If this is the case, re-use identifier.
+                    // collect metadata (default do Document docstruct, if metadata is missing in photograph)
+                    for (JsonField jsonField : jsonFields) {
+                        String fieldValue = getJsonFieldValue(jsonField, logical, photograph, isFistImage, image);
+                        metadata.put(jsonField.getName(), fieldValue);
+                        // TODO check if filename was used in previous export. If this is the case, re-use identifier.
+                    }
+                    metadataList.add(metadata);
+                    isFistImage = false;
                 }
-                metadataList.add(metadata);
-                isFistImage = false;
 
             }
         }
 
-        Path tempDir = Files.createTempDirectory(herisId);
+        tempDir = Files.createTempDirectory(herisId);
 
         // export images to tmp folder
-        exportSelectedImagesToTempFolder(process, selectedImagesList, tempDir);
+        exportSelectedImagesToTempFolder(process, selectedImagesList);
         // create json file in tmp folder
-        writeJsonFile(tempDir, metadataList, herisId);
+        writeJsonFile(metadataList, herisId);
         // upload data via sftp
-        uploadData(tempDir);
+        uploadData();
 
         // finally delete tmp folder
-        StorageProvider.getInstance().deleteDir(tempDir);
+        if (cleanupTempFiles) {
+            StorageProvider.getInstance().deleteDir(tempDir);
+        }
 
-        return false;
+        return true;
     }
 
-    private void uploadData(Path tempDir) {
+    private void uploadData() {
         // TODO Auto-generated method stub
 
     }
 
-    private void writeJsonFile(Path tempDir, List<Map<String, String>> metadataList, String herisId) {
+    private void writeJsonFile(List<Map<String, String>> metadataList, String herisId) {
         JSONObject jsonObject = new JSONObject();
 
         List<JSONObject> list = new ArrayList<>();
@@ -205,10 +218,9 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         } catch (IOException e) {
             log.error(e);
         }
-
     }
 
-    private void exportSelectedImagesToTempFolder(Process process, List<String> imagesList, Path tempDir) {
+    private void exportSelectedImagesToTempFolder(Process process, List<String> imagesList) {
         try {
             String imageFolder = process.getImagesTifDirectory(false);
             for (String imagename : imagesList) {
@@ -268,7 +280,6 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         propertyName = config.getString("./propertyName", "");
 
         jsonRootElementName = config.getString("/jsonRootElement");
-        herisId = config.getString("/herisId");
 
         jsonFields = new ArrayList<>();
 
@@ -287,25 +298,6 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
             jsonFields.add(jf);
         }
 
-    }
-
-    /**
-     * get the proper Processproperty object holding information of all selected images
-     * 
-     * @param process Goobi process
-     * @return the Processproperty object holding information of all selected images
-     */
-    private Processproperty getProcessproperty(Process process) {
-        List<Processproperty> props = PropertyManager.getProcessPropertiesForProcess(process.getId());
-        for (Processproperty p : props) {
-            if (propertyName.equals(p.getTitel())) {
-                return p;
-            }
-        }
-        // nothing found, report it
-        String message = "Can not find a proper process property. Please recheck your configuration.";
-        log.info(message);
-        return null;
     }
 
     /**

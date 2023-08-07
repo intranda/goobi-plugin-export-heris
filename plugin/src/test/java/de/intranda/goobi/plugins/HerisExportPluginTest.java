@@ -1,6 +1,7 @@
 package de.intranda.goobi.plugins;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +16,9 @@ import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
+import org.easymock.EasyMock;
 import org.goobi.beans.Process;
+import org.goobi.beans.Processproperty;
 import org.goobi.beans.Project;
 import org.goobi.beans.ProjectFileGroup;
 import org.goobi.beans.Ruleset;
@@ -25,16 +28,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.config.ConfigurationHelper;
+import de.sub.goobi.helper.VariableReplacer;
 import de.sub.goobi.metadaten.MetadatenHelper;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ ConfigPlugins.class, ConfigurationHelper.class, MetadatenHelper.class, })
+@PrepareForTest({ MetadatenHelper.class, VariableReplacer.class, ConfigurationHelper.class })
 @PowerMockIgnore({ "javax.management.*", "javax.net.ssl.*", "jdk.internal.reflect.*" })
 public class HerisExportPluginTest {
 
@@ -77,50 +81,69 @@ public class HerisExportPluginTest {
         Path metaSource = Paths.get(resourcesFolder + "meta.xml");
         Path metaTarget = Paths.get(processDirectory.getAbsolutePath(), "meta.xml");
         Files.copy(metaSource, metaTarget);
+        // copy images to media folder
+        Path imagesSource = Paths.get(resourcesFolder, "sample_media");
+        Path imagesTarget = Paths.get(processDirectory.getAbsolutePath(), "images", "sample_media");
+        Files.createDirectories(imagesTarget);
+        Files.copy(Paths.get(imagesSource.toString(), "Sammelmappe1.pdf_Seite_007.tif"),
+                Paths.get(imagesTarget.toString(), "Sammelmappe1.pdf_Seite_007.tif"));
+        Files.copy(Paths.get(imagesSource.toString(), "Sammelmappe1.pdf_Seite_008.tif"),
+                Paths.get(imagesTarget.toString(), "Sammelmappe1.pdf_Seite_008.tif"));
+        Files.copy(Paths.get(imagesSource.toString(), "Sammelmappe1.pdf_Seite_009.tif"),
+                Paths.get(imagesTarget.toString(), "Sammelmappe1.pdf_Seite_009.tif"));
+        Files.copy(Paths.get(imagesSource.toString(), "Sammelmappe1.pdf_Seite_010.tif"),
+                Paths.get(imagesTarget.toString(), "Sammelmappe1.pdf_Seite_010.tif"));
+        Files.copy(Paths.get(imagesSource.toString(), "Sammelmappe1.pdf_Seite_011.tif"),
+                Paths.get(imagesTarget.toString(), "Sammelmappe1.pdf_Seite_011.tif"));
 
-        //        PowerMock.mockStatic(ConfigurationHelper.class);
-        //        ConfigurationHelper configurationHelper = EasyMock.createMock(ConfigurationHelper.class);
-        //        EasyMock.expect(ConfigurationHelper.getInstance()).andReturn(configurationHelper).anyTimes();
-        //        EasyMock.expect(configurationHelper.getMetsEditorLockingTime()).andReturn(1800000l).anyTimes();
-        //        EasyMock.expect(configurationHelper.isAllowWhitespacesInFolder()).andReturn(false).anyTimes();
-        //        EasyMock.expect(configurationHelper.useS3()).andReturn(false).anyTimes();
-        //        EasyMock.expect(configurationHelper.isUseProxy()).andReturn(false).anyTimes();
-        //        EasyMock.expect(configurationHelper.getGoobiContentServerTimeOut()).andReturn(60000).anyTimes();
-        //        EasyMock.expect(configurationHelper.getMetadataFolder()).andReturn(metadataDirectoryName).anyTimes();
-        //        EasyMock.expect(configurationHelper.getRulesetFolder()).andReturn(resourcesFolder).anyTimes();
-        //        EasyMock.expect(configurationHelper.getProcessImagesMainDirectoryName()).andReturn("00469418X_media").anyTimes();
-        //        EasyMock.expect(configurationHelper.isUseMasterDirectory()).andReturn(true).anyTimes();
-        //
-        //        EasyMock.expect(configurationHelper.getNumberOfMetaBackups()).andReturn(0).anyTimes();
-        //        EasyMock.replay(configurationHelper);
-        //
-        //        MetadatenSperrung locking = new MetadatenSperrung();
-        //        locking.setLocked(1, "1");
-        //
-        //        testProcess = createProcess();
-        //
-        //        PowerMock.mockStatic(MetadatenHelper.class);
-        //        EasyMock.expect(MetadatenHelper.getMetaFileType(EasyMock.anyString())).andReturn("metsmods").anyTimes();
-        //        EasyMock.expect(MetadatenHelper.getFileformatByName(EasyMock.anyString(), EasyMock.anyObject(Ruleset.class)))
-        //        .andReturn(new MetsMods(testProcess.getRegelsatz().getPreferences()))
-        //        .anyTimes();
-        //        EasyMock.expect(MetadatenHelper.getExportFileformatByName(EasyMock.anyString(), EasyMock.anyObject(Ruleset.class)))
-        //        .andReturn(new MetsModsImportExport(testProcess.getRegelsatz().getPreferences()))
-        //        .anyTimes();
-        //
-        //        PowerMock.mockStatic(Helper.class);
-        //
-        //        EasyMock.expect(Helper.getCurrentUser()).andReturn(null).anyTimes();
-        //        EasyMock.expect(Helper.getTranslation(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString())).andReturn("").anyTimes();
-        //        Helper.setFehlerMeldung(EasyMock.anyString());
-        //        Helper.setMeldung(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString());
-        //        PowerMock.replayAll();
+        PowerMock.mockStatic(ConfigurationHelper.class);
+        ConfigurationHelper configurationHelper = EasyMock.createMock(ConfigurationHelper.class);
+        EasyMock.expect(ConfigurationHelper.getInstance()).andReturn(configurationHelper).anyTimes();
+        EasyMock.expect(configurationHelper.getMetsEditorLockingTime()).andReturn(1800000l).anyTimes();
+        EasyMock.expect(configurationHelper.isAllowWhitespacesInFolder()).andReturn(false).anyTimes();
+        EasyMock.expect(configurationHelper.useS3()).andReturn(false).anyTimes();
+        EasyMock.expect(configurationHelper.isUseProxy()).andReturn(false).anyTimes();
+        EasyMock.expect(configurationHelper.getGoobiContentServerTimeOut()).andReturn(60000).anyTimes();
+
+        EasyMock.expect(configurationHelper.getConfigurationFolder()).andReturn(resourcesFolder + "config/").anyTimes();
+
+        EasyMock.expect(configurationHelper.getMetadataFolder()).andReturn(metadataDirectory.toString() + "/").anyTimes();
+        EasyMock.expect(configurationHelper.getRulesetFolder()).andReturn(resourcesFolder).anyTimes();
+        EasyMock.expect(configurationHelper.getProcessImagesMainDirectoryName()).andReturn("sample_media").anyTimes();
+        EasyMock.expect(configurationHelper.isUseMasterDirectory()).andReturn(true).anyTimes();
+        EasyMock.replay(configurationHelper);
+        PowerMock.replay(ConfigurationHelper.class);
+        testProcess = createProcess();
+
     }
 
     @Test
     public void testConstructor() {
         HerisExportPlugin plugin = new HerisExportPlugin();
         assertNotNull(plugin);
+    }
+
+    @Test
+    public void testStartExport() throws Exception {
+        HerisExportPlugin plugin = new HerisExportPlugin();
+        assertNotNull(plugin);
+        plugin.setCleanupTempFiles(false);
+        assertTrue(plugin.startExport(testProcess));
+
+        // check that json file was created
+        Path destination = plugin.getTempDir();
+        Path jsonFile = Paths.get(destination.toString(), "21.json");
+        assertTrue(Files.exists(jsonFile));
+
+        // check that images are exported
+        assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_007.tif")));
+        assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_008.tif")));
+        assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_009.tif")));
+        assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_010.tif")));
+        assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_011.tif")));
+
+        // open json file, check content
+
     }
 
     private XMLConfiguration getConfig() {
@@ -143,19 +166,20 @@ public class HerisExportPluginTest {
         testProcess.setTitel("testprocess");
         testProcess.setId(1);
 
+        Processproperty prop = new Processproperty();
+        prop.setTitel("plugin_intranda_step_image_selection");
+        prop.setWert(
+                "{\"Sammelmappe1.pdf_Seite_008.tif\":1,\"Sammelmappe1.pdf_Seite_009.tif\":2,\"Sammelmappe1.pdf_Seite_011.tif\":3,\"Sammelmappe1.pdf_Seite_010.tif\":4,\"Sammelmappe1.pdf_Seite_007.tif\":5}");
+        List<Processproperty> props = new ArrayList<>();
+        props.add(prop);
+        testProcess.setEigenschaften(props);
+
         // set temporary ruleset
         setUpRuleset(testProcess);
 
         setUpProject(testProcess);
 
-        setUpConfig();
-
         return testProcess;
-    }
-
-    private static void setUpConfig() {
-        ConfigurationHelper.getInstance().setParameter("DIRECTORY_SUFFIX", "media");
-        ConfigurationHelper.getInstance().setParameter("DIRECTORY_PREFIX", "master");
     }
 
     private static void setUpProject(Process testProcess) throws IOException {

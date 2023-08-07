@@ -1,0 +1,32 @@
+<config_plugin>
+    <!-- 
+    Order of configuration is: 
+    1.) project name matches
+    2.) project is * 
+    -->
+
+    <config>
+        <project>*</project>
+        <step>*</step>
+        <!-- the name of the process property which contains information of selected images -->
+        <propertyName>plugin_intranda_step_image_selection</propertyName>
+
+
+        <jsonRootElement>Bilder</jsonRootElement>
+        <herisId>HERIS-ID</herisId>
+        <!-- configure here the default settings for the JSON format -->
+        <json_format>
+            <field type="identifier" name="Id"><!-- TODO re-use old existing id --></field>
+            <field type="metadata" name="Titel">TitleDocMain</field>
+            <field type="metadata" name="alt_text">TitleDocMain</field>
+            <field type="representative" name="Symbolbild"></field>
+            <field type="static" name="media_type">JPEG</field>
+            <field type="metadata" name="Aufnahmedatum">DateRecorded</field>
+            <field type="metadata" name="Copyright BDA">Copyright</field>
+            <field type="filename" name="Dateiinformation"></field>
+            <field type="metadata" name="publikationsfähig">Published</field>
+            <field type="metadata" name="Migrierte Information"><!-- TODO --></field>
+        </json_format>
+
+    </config>
+</config_plugin>
