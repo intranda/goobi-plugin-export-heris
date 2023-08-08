@@ -8,6 +8,18 @@
     <dest.folder>/opt/digiverso/goobi/plugins/export/</dest.folder>
     <goobi.version>23.07.1</goobi.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Sonar -->
+    <sonar.projectKey>intranda_goobi-plugin-export-heris</sonar.projectKey>
+    <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+    <sonar.organization>intranda</sonar.organization>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <sonar.java.source>11</sonar.java.source>
+    <sonar.java.target>11</sonar.java.target>
+    <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    <!-- Tests need to be excluded here, otherwise they would be indexed for analysis
+         in the module-ci AND the parent project and this leads to an error because
+         one file cannot be added twice -->
+    <sonar.test.exclusions>src/test/java/**/*</sonar.test.exclusions>    
   </properties>
   <distributionManagement>
     <repository>
@@ -87,6 +99,26 @@
           </archive>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.7</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
     </plugins>
   </build>
   <dependencies>
