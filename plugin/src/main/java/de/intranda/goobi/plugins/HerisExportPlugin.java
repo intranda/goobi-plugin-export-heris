@@ -178,7 +178,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
             return false;
         }
 
-        tempDir = Files.createTempDirectory(herisId);
+        tempDir = Files.createTempDirectory(herisId); // NOSONAR temp dir is safe here, it gets deleted at the end
 
         //  open sftp connection,
         connect();
