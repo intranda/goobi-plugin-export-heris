@@ -54,7 +54,6 @@ import de.sub.goobi.helper.exceptions.DAOException;
 import de.sub.goobi.helper.exceptions.ExportFileException;
 import de.sub.goobi.helper.exceptions.SwapException;
 import de.sub.goobi.helper.exceptions.UghHelperException;
-import io.goobi.workflow.api.connection.SftpUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -109,20 +108,20 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
     private String knownHosts;
     private String ftpFolder;
     private int port = 22;
-    private transient SftpUtils utils = null;
+    private transient SftpClient utils = null;
 
     @Override
     public boolean startExport(Process process) throws IOException, InterruptedException, DocStructHasNoTypeException, PreferencesException,
-            WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException, SwapException, DAOException,
-            TypeNotAllowedForParentException {
+    WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException, SwapException, DAOException,
+    TypeNotAllowedForParentException {
 
         return startExport(process, null);
     }
 
     @Override
     public boolean startExport(Process process, String destination) throws IOException, InterruptedException, DocStructHasNoTypeException,
-            PreferencesException, WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException,
-            SwapException, DAOException, TypeNotAllowedForParentException {
+    PreferencesException, WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException,
+    SwapException, DAOException, TypeNotAllowedForParentException {
         problems = new ArrayList<>();
 
         // read configuration file
@@ -250,7 +249,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         // create json file in tmp folder
         writeJsonFile(metadataList, herisId);
         // upload data via sftp
-        uploadData();
+        uploadData(herisId);
 
         // finally delete tmp folder
         if (cleanupTempFiles) {
@@ -411,15 +410,15 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
             try {
                 // first option, use passphrase protected keyfile
                 if (StringUtils.isNotBlank(keyfile) && StringUtils.isNotBlank(password)) {
-                    utils = new SftpUtils(username, keyfile, password, hostname, port, knownHosts);
+                    utils = new SftpClient(username, keyfile, password, hostname, port, knownHosts);
                 }
                 // second option: use keyfile without passphrase
                 else if (StringUtils.isNotBlank(keyfile)) {
-                    utils = new SftpUtils(username, keyfile, null, hostname, port, knownHosts);
+                    utils = new SftpClient(username, keyfile, null, hostname, port, knownHosts);
                 }
                 // third option, username + password
                 else {
-                    utils = new SftpUtils(username, password, hostname, port, knownHosts);
+                    utils = new SftpClient(username, password, hostname, port, knownHosts);
                 }
             } catch (IOException e) {
                 log.error(e);
@@ -453,15 +452,47 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         return jsonFile;
     }
 
-    private void uploadData() {
+    private void uploadData(String herisId) {
+        if (useSftp) {
+            try {
+                // open remote folder
+                utils.changeRemoteFolder(ftpFolder);
+                // list content, check if sub folder for heris id exists
+                List<String> content = utils.listContent();
+                if (!content.contains(herisId)) {
+                    // create new remote folder, if missing
+                    utils.createSubFolder(herisId);
+                }
+                // switch to heris folder
+                utils.changeRemoteFolder(herisId);
+            } catch (IOException e) {
+                log.error(e);
+            }
 
-        // TODO
-        // create new remote folder, if missing
-        // list all files in remote folder
-        // compare filenames with new files
-        // if remote file is not present in local folder, delete it
-        // upload new images + json + backup file
 
+            // list all files in remote folder
+            List<String> localData = StorageProvider.getInstance().list(tempDir.toString());
+            try {
+                List<String> remoteData = utils.listContent();
+
+                // compare filenames with new files
+                for (String remoteFile : remoteData) {
+                    if (remoteFile.toLowerCase().endsWith("tif") || remoteFile.toLowerCase().endsWith("jpg")) {
+
+                        if (!localData.contains(remoteFile)) {
+                            // if remote file is not present in local folder, delete it
+                            utils.deleteFile(remoteFile);
+                        }
+                    }
+                }
+                // upload new images + json + backup file
+                for (String localFile : localData) {
+                    utils.uploadFile(Paths.get(tempDir.toString(), localFile));
+                }
+            } catch (IOException e) {
+                log.error(e);
+            }
+        }
     }
 
     private void disconnect() {
