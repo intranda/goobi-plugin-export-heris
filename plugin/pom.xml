@@ -3,6 +3,7 @@
   <groupId>de.intranda.goobi.plugins.export</groupId>
   <artifactId>heris</artifactId>
   <version>23.07.1</version>
+  <name>Goobi workflow - Plugin Export HERIS</name>
   <properties>
     <jar.name>plugin_intranda_export_heris</jar.name>
     <dest.folder>/opt/digiverso/goobi/plugins/export/</dest.folder>
