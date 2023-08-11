@@ -2,12 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.intranda.goobi.plugins.export</groupId>
   <artifactId>heris</artifactId>
-  <version>23.07.1</version>
+  <version>23.07.2</version>
   <name>Goobi workflow - Plugin Export HERIS</name>
   <properties>
     <jar.name>plugin_intranda_export_heris</jar.name>
     <dest.folder>/opt/digiverso/goobi/plugins/export/</dest.folder>
-    <goobi.version>23.07.1</goobi.version>
+    <goobi.version>23.07.2</goobi.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Sonar -->
     <sonar.projectKey>intranda_goobi-plugin-export-heris</sonar.projectKey>
@@ -20,7 +20,7 @@
     <!-- Tests need to be excluded here, otherwise they would be indexed for analysis
          in the module-ci AND the parent project and this leads to an error because
          one file cannot be added twice -->
-    <sonar.test.exclusions>src/test/java/**/*</sonar.test.exclusions>    
+    <sonar.test.exclusions>src/test/java/**/*</sonar.test.exclusions>
   </properties>
   <distributionManagement>
     <repository>
@@ -119,7 +119,6 @@
           </execution>
         </executions>
       </plugin>
-      
     </plugins>
   </build>
   <dependencies>
