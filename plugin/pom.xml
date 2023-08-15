@@ -2,12 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.intranda.goobi.plugins.export</groupId>
   <artifactId>heris</artifactId>
-  <version>23.07.2</version>
+  <version>23.07.3</version>
   <name>Goobi workflow - Plugin Export HERIS</name>
   <properties>
     <jar.name>plugin_intranda_export_heris</jar.name>
     <dest.folder>/opt/digiverso/goobi/plugins/export/</dest.folder>
-    <goobi.version>23.07.2</goobi.version>
+    <goobi.version>23.07.3</goobi.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Sonar -->
     <sonar.projectKey>intranda_goobi-plugin-export-heris</sonar.projectKey>
