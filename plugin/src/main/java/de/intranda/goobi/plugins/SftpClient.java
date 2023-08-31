@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
@@ -43,13 +44,14 @@ public class SftpClient {
      * 
      */
 
-    public SftpClient(String username, String password, String hostname, int port, String knownHostsFile) throws IOException {
+    public SftpClient(String username, String password, String hostname, int port, String knownHostsFile, Properties additionalConfig) throws IOException {
         jsch = new JSch();
         try {
             jsch.setKnownHosts(knownHostsFile);
             jschSession = jsch.getSession(username, hostname);
             jschSession.setPort(port);
             jschSession.setPassword(password);
+            setCustomConfig(jschSession,additionalConfig);
             jschSession.connect();
             sftpChannel = (ChannelSftp) jschSession.openChannel("sftp");
             sftpChannel.connect();
@@ -64,13 +66,14 @@ public class SftpClient {
      * 
      */
 
-    public SftpClient(String username, String key, String password, String hostname, int port, String knownHostsFile) throws IOException {
+    public SftpClient(String username, String key, String password, String hostname, int port, String knownHostsFile, Properties additionalConfig) throws IOException {
         jsch = new JSch();
         try {
             jsch.addIdentity(key, password);
             jsch.setKnownHosts(knownHostsFile);
             jschSession = jsch.getSession(username, hostname);
             jschSession.setPort(port);
+            setCustomConfig(jschSession,additionalConfig);
             jschSession.connect();
             sftpChannel = (ChannelSftp) jschSession.openChannel("sftp");
             sftpChannel.connect();
@@ -78,6 +81,13 @@ public class SftpClient {
             throw new IOException(e);
         }
     }
+
+    private void setCustomConfig(Session jschSession, Properties additionalConfig) {
+        if(additionalConfig != null) {
+            jschSession.setConfig(additionalConfig);
+        }
+    }
+
 
     /**
      * Change remote folder

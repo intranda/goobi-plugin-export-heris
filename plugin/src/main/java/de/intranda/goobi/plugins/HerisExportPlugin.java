@@ -26,10 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
@@ -108,6 +105,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
     private String knownHosts;
     private String ftpFolder;
     private int port = 22;
+    private Properties sftpConfig = new Properties();
     private transient SftpClient utils = null;
 
     @Override
@@ -126,6 +124,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
 
         // read configuration file
         readConfiguration(process);
+
 
         // open metadata file
         Fileformat fileformat = process.readMetadataFile();
@@ -366,6 +365,11 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         knownHosts = config.getString("/sftp/knownHosts", System.getProperty("user.home").concat("/.ssh/known_hosts"));
         ftpFolder = config.getString("/sftp/sftpFolder");
 
+        String pubkeyAcceptedAlgorithms = config.getString("/sftp/pubkeyAcceptedAlgorithms");
+        if(pubkeyAcceptedAlgorithms != null) {
+            sftpConfig.put("pubkeyAcceptedAlgorithms", pubkeyAcceptedAlgorithms);
+        }
+
     }
 
     /**
@@ -410,15 +414,15 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
             try {
                 // first option, use passphrase protected keyfile
                 if (StringUtils.isNotBlank(keyfile) && StringUtils.isNotBlank(password)) {
-                    utils = new SftpClient(username, keyfile, password, hostname, port, knownHosts);
+                    utils = new SftpClient(username, keyfile, password, hostname, port, knownHosts, sftpConfig);
                 }
                 // second option: use keyfile without passphrase
                 else if (StringUtils.isNotBlank(keyfile)) {
-                    utils = new SftpClient(username, keyfile, null, hostname, port, knownHosts);
+                    utils = new SftpClient(username, keyfile, null, hostname, port, knownHosts, sftpConfig);
                 }
                 // third option, username + password
                 else {
-                    utils = new SftpClient(username, password, hostname, port, knownHosts);
+                    utils = new SftpClient(username, password, hostname, port, knownHosts, sftpConfig);
                 }
             } catch (IOException e) {
                 log.error(e);
