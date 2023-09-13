@@ -109,17 +109,14 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
     private transient SftpClient utils = null;
 
     @Override
-    public boolean startExport(Process process) throws IOException, InterruptedException, DocStructHasNoTypeException, PreferencesException,
-    WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException, SwapException, DAOException,
-    TypeNotAllowedForParentException {
-
+    public boolean startExport(Process process) throws IOException, DocStructHasNoTypeException, PreferencesException, SwapException, ReadException {
         return startExport(process, null);
     }
 
     @Override
-    public boolean startExport(Process process, String destination) throws IOException, InterruptedException, DocStructHasNoTypeException,
-    PreferencesException, WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException,
-    SwapException, DAOException, TypeNotAllowedForParentException {
+    public boolean startExport(Process process, String destination) throws IOException, DocStructHasNoTypeException,
+    PreferencesException, ReadException,
+    SwapException {
         problems = new ArrayList<>();
 
         // read configuration file
@@ -367,7 +364,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
 
         String pubkeyAcceptedAlgorithms = config.getString("/sftp/pubkeyAcceptedAlgorithms");
         if(pubkeyAcceptedAlgorithms != null) {
-            sftpConfig.put("pubkeyAcceptedAlgorithms", pubkeyAcceptedAlgorithms);
+            sftpConfig.put("PubkeyAcceptedAlgorithms", pubkeyAcceptedAlgorithms);
         }
 
     }
@@ -411,17 +408,21 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
 
     private void connect() {
         if (useSftp) {
+            log.debug("Connecting to sftp");
             try {
                 // first option, use passphrase protected keyfile
                 if (StringUtils.isNotBlank(keyfile) && StringUtils.isNotBlank(password)) {
+                    log.debug("Connecting to sftp using keyfile and password");
                     utils = new SftpClient(username, keyfile, password, hostname, port, knownHosts, sftpConfig);
                 }
                 // second option: use keyfile without passphrase
                 else if (StringUtils.isNotBlank(keyfile)) {
+                    log.debug("Connecting to sftp using keyfile");
                     utils = new SftpClient(username, keyfile, null, hostname, port, knownHosts, sftpConfig);
                 }
                 // third option, username + password
                 else {
+                    log.debug("Connecting to sftp using username and password");
                     utils = new SftpClient(username, password, hostname, port, knownHosts, sftpConfig);
                 }
             } catch (IOException e) {
