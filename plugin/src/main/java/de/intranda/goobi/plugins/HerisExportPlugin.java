@@ -263,7 +263,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
             JSONObject jo = new JSONObject(map);
             list.add(jo);
         }
-        jsonObject.put("HERIS-ID", "herisId");
+        jsonObject.put("HERIS-ID", herisId);
         jsonObject.put(jsonRootElementName, list);
 
         Path jsonFilePath = Paths.get(tempDir.toString(), herisId + ".json");
