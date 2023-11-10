@@ -18,22 +18,32 @@
 
 package de.intranda.goobi.plugins;
 
+import java.awt.Dimension;
+import java.awt.image.RenderedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.goobi.beans.Process;
 import org.goobi.beans.Processproperty;
@@ -41,16 +51,19 @@ import org.goobi.beans.Step;
 import org.goobi.production.enums.PluginType;
 import org.goobi.production.plugin.interfaces.IExportPlugin;
 import org.goobi.production.plugin.interfaces.IPlugin;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.sub.goobi.config.ConfigPlugins;
+import de.sub.goobi.config.ConfigurationHelper;
 import de.sub.goobi.helper.Helper;
 import de.sub.goobi.helper.StorageProvider;
 import de.sub.goobi.helper.exceptions.DAOException;
 import de.sub.goobi.helper.exceptions.ExportFileException;
 import de.sub.goobi.helper.exceptions.SwapException;
 import de.sub.goobi.helper.exceptions.UghHelperException;
+import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
+import de.unigoettingen.sub.commons.contentlib.imagelib.ImageManager;
+import de.unigoettingen.sub.commons.contentlib.imagelib.JpegInterpreter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -108,23 +121,26 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
     private Properties sftpConfig = new Properties();
     private transient SftpClient utils = null;
 
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+
+    private Date exportDate = new Date();
+
     @Override
     public boolean startExport(Process process) throws IOException, InterruptedException, DocStructHasNoTypeException, PreferencesException,
-    WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException, SwapException, DAOException,
-    TypeNotAllowedForParentException {
+            WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException, SwapException, DAOException,
+            TypeNotAllowedForParentException {
 
         return startExport(process, null);
     }
 
     @Override
     public boolean startExport(Process process, String destination) throws IOException, InterruptedException, DocStructHasNoTypeException,
-    PreferencesException, WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException,
-    SwapException, DAOException, TypeNotAllowedForParentException {
+            PreferencesException, WriteException, MetadataTypeNotAllowedException, ExportFileException, UghHelperException, ReadException,
+            SwapException, DAOException, TypeNotAllowedForParentException {
         problems = new ArrayList<>();
 
         // read configuration file
         readConfiguration(process);
-
 
         // open metadata file
         Fileformat fileformat = process.readMetadataFile();
@@ -145,7 +161,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         }
 
         // find the images to export
-        List<String> selectedImagesList = new ArrayList<>();
+        Map<String, String> selectedImagesList = new HashMap<>();
         Processproperty property = null;
         for (Processproperty p : process.getEigenschaften()) {
             if (propertyName.equals(p.getTitel())) {
@@ -164,7 +180,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
                 String imageName = itemParts[0];
                 // remove " from both ends
                 String reducedImageName = imageName.substring(1, imageName.length() - 1);
-                selectedImagesList.add(reducedImageName);
+                selectedImagesList.put(reducedImageName, "");
             }
         } else {
             Helper.setFehlerMeldung("The record has no images selected, abort");
@@ -184,24 +200,8 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         // search for previous entry
         Path previousData = getExistingJsonFile(herisId);
 
-        Map<String, String> imageIdentifierMap = new HashMap<>();
         if (previousData != null) {
-            // parse file, generate filename + identifier list
-            InputStream is = StorageProvider.getInstance().newInputStream(previousData);
-            String jsonTxt = IOUtils.toString(is, Charset.defaultCharset());
-
-            JSONObject json = new JSONObject(jsonTxt);
-
-            JSONArray images = json.getJSONArray(jsonRootElementName);
-
-            for (Object imageObject : images) {
-                JSONObject image = (JSONObject) imageObject;
-                String filename = image.getString("Dateiinformation");
-                String identifier = image.getString("Id");
-                imageIdentifierMap.put(filename, identifier);
-            }
-
-            // rename file
+            // create backup file
             Path backupFile =
                     Paths.get(previousData.getParent().toString(), previousData.getFileName().toString() + "-" + System.currentTimeMillis());
             Files.move(previousData, backupFile);
@@ -210,9 +210,11 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         //  first one is always the representative
         boolean isFistImage = true;
         // get photograph docstructs for those imagess
-        List<Map<String, String>> metadataList = new ArrayList<>();
-        for (String image : selectedImagesList) {
-            Map<String, String> metadata = new HashMap<>();
+        List<Map<String, Object>> metadataList = new ArrayList<>();
+        Set<String> imageNames = new HashSet<>(selectedImagesList.keySet());
+        for (String image : imageNames) {
+
+            Map<String, Object> metadata = new HashMap<>();
             for (DocStruct page : pages) {
                 String pageFileName = Paths.get(page.getImageName()).getFileName().toString();
                 // comparison with filenames only
@@ -224,17 +226,18 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
                             photograph = ref.getSource();
                         }
                     }
+                    String newImageName = image;
+                    for (Metadata md : photograph.getAllMetadata()) {
+                        if ("shelfmarksource".equals(md.getType().getName())) {
+                            newImageName = md.getValue() + ".jpg";
+                        }
+                    }
+                    selectedImagesList.put(image, newImageName);
 
                     // collect metadata (default do Document docstruct, if metadata is missing in photograph)
                     for (JsonField jsonField : jsonFields) {
-                        String fieldValue = getJsonFieldValue(jsonField, logical, photograph, isFistImage, image);
+                        Object fieldValue = getJsonFieldValue(jsonField, logical, photograph, isFistImage, image, herisId);
                         metadata.put(jsonField.getName(), fieldValue);
-
-                        // if filename was used in previous export, re-use identifier. Otherwise identifier field is blank
-                        if ("identifier".equals(jsonField.getType())) {
-                            metadata.put(jsonField.getName(), imageIdentifierMap.get(image));
-                        }
-
                     }
                     metadataList.add(metadata);
                     isFistImage = false;
@@ -258,15 +261,16 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         return true;
     }
 
-    private void writeJsonFile(List<Map<String, String>> metadataList, String herisId) {
+    private void writeJsonFile(List<Map<String, Object>> metadataList, String herisId) {
         JSONObject jsonObject = new JSONObject();
 
         List<JSONObject> list = new ArrayList<>();
-        for (Map<String, String> map : metadataList) {
+        for (Map<String, Object> map : metadataList) {
             JSONObject jo = new JSONObject(map);
             list.add(jo);
         }
-        jsonObject.put("HERIS-ID", "herisId");
+        jsonObject.put("HERIS-ID", Integer.parseInt(herisId));
+        jsonObject.put("Aktualisierungsdatum", sdf.format(exportDate));
         jsonObject.put(jsonRootElementName, list);
 
         Path jsonFilePath = Paths.get(tempDir.toString(), herisId + ".json");
@@ -278,20 +282,59 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         }
     }
 
-    private void exportSelectedImagesToTempFolder(Process process, List<String> imagesList) {
+    private void exportSelectedImagesToTempFolder(Process process, Map<String, String> imagesList) {
+
         try {
             String imageFolder = process.getImagesTifDirectory(false);
-            for (String imagename : imagesList) {
-                Path source = Paths.get(imageFolder, imagename);
-                Path destination = Paths.get(tempDir.toString(), imagename);
-                StorageProvider.getInstance().copyFile(source, destination);
+
+            for (Entry<String, String> image : imagesList.entrySet()) {
+                Path source = Paths.get(imageFolder, image.getKey());
+                Path destination = Paths.get(tempDir.toString(), image.getValue());
+
+                //  create new jpg files, max 600x600
+                ImageManager im = null;
+                JpegInterpreter pi = null;
+                try {
+                    if (ConfigurationHelper.getInstance().useS3()) {
+                        try {
+                            URI uri = new URI(source.toString()
+                                    .replace(ConfigurationHelper.getInstance().getMetadataFolder(),
+                                            "s3://" + ConfigurationHelper.getInstance().getS3Bucket() + "/"));
+                            im = new ImageManager(uri);
+                        } catch (URISyntaxException e) {
+                            log.error(e);
+                        }
+                    } else {
+                        im = new ImageManager(source.toUri());
+                    }
+
+                    Dimension dim = new Dimension(600, 600);
+                    RenderedImage ri2 = im.scaleImageByPixel(dim, ImageManager.SCALE_TO_BOX, 0);
+                    pi = new JpegInterpreter(ri2);
+
+                    OutputStream outputFileStream = StorageProvider.getInstance().newOutputStream(destination);
+
+                    pi.writeToStream(null, outputFileStream);
+                    outputFileStream.close();
+                } catch (IOException | ContentLibException e) {
+                    log.error(e);
+
+                } finally {
+                    if (im != null) {
+                        im.close();
+                    }
+                    if (pi != null) {
+                        pi.close();
+                    }
+                }
             }
         } catch (IOException | SwapException e) {
             log.error(e);
         }
     }
 
-    private String getJsonFieldValue(JsonField jsonField, DocStruct logical, DocStruct photograph, boolean representative, String filename) {
+    private Object getJsonFieldValue(JsonField jsonField, DocStruct logical, DocStruct photograph, boolean representative, String filename,
+            String herisID) {
 
         switch (jsonField.getType()) {
             case "static":
@@ -320,7 +363,11 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
             case "filename":
                 return filename;
             case "representative":
-                return String.valueOf(representative);
+                return representative;
+            case "date":
+                return sdf.format(exportDate);
+            case "herisid":
+                return Integer.parseInt(herisID);
             case "identifier":
             default:
                 return "";
@@ -366,7 +413,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
         ftpFolder = config.getString("/sftp/sftpFolder");
 
         String pubkeyAcceptedAlgorithms = config.getString("/sftp/pubkeyAcceptedAlgorithms");
-        if(pubkeyAcceptedAlgorithms != null) {
+        if (pubkeyAcceptedAlgorithms != null) {
             sftpConfig.put("pubkeyAcceptedAlgorithms", pubkeyAcceptedAlgorithms);
         }
 
@@ -472,7 +519,6 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
             } catch (IOException e) {
                 log.error(e);
             }
-
 
             // list all files in remote folder
             List<String> localData = StorageProvider.getInstance().list(tempDir.toString());

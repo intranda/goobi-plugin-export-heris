@@ -16,16 +16,13 @@
         <herisId>HERIS-ID</herisId>
         <!-- configure here the default settings for the JSON format -->
         <json_format>
-            <field type="identifier" name="Id"><!-- TODO re-use old existing id --></field>
-            <field type="metadata" name="Titel">TitleDocMain</field>
-            <field type="metadata" name="alt_text">TitleDocMain</field>
-            <field type="representative" name="Symbolbild"></field>
-            <field type="static" name="media_type">JPEG</field>
+            <field type="identifier" name="Id"><!--re-use old existing id or leave it blank in new exports--></field>
+            <field type="herisid" name="HERIS-ID"></field>
+            <field type="metadata" name="BildId">shelfmarksource</field>
+            <field type="metadata" name="Bildtitel">TitleDocMain</field>
+            <field type="date" name="Aktualisierungsdatum"></field>
             <field type="metadata" name="Aufnahmedatum">DateRecorded</field>
-            <field type="metadata" name="Copyright BDA">Copyright</field>
-            <field type="filename" name="Dateiinformation"></field>
-            <field type="metadata" name="publikationsfähig">Published</field>
-            <field type="metadata" name="Migrierte Information"><!-- TODO --></field>
+            <field type="representative" name="Symbolbild"></field>
         </json_format>
 
 

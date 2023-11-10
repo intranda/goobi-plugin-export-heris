@@ -152,11 +152,11 @@ public class HerisExportPluginTest {
         assertTrue(Files.exists(jsonFile));
 
         // check that images are exported
-        assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_007.tif")));
-        assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_008.tif")));
-        assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_009.tif")));
-        assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_010.tif")));
-        assertTrue(Files.exists(Paths.get(destination.toString(), "Sammelmappe1.pdf_Seite_011.tif")));
+        assertTrue(Files.exists(Paths.get(destination.toString(), "AT-BDA-FA-01-05-GZ-001.jpg")));
+        assertTrue(Files.exists(Paths.get(destination.toString(), "AT-BDA-FA-01-05-GZ-002.jpg")));
+        assertTrue(Files.exists(Paths.get(destination.toString(), "AT-BDA-FA-01-05-GZ-003.jpg")));
+        assertTrue(Files.exists(Paths.get(destination.toString(), "AT-BDA-FA-01-05-GZ-004.jpg")));
+        assertTrue(Files.exists(Paths.get(destination.toString(), "AT-BDA-FA-01-05-GZ-005.jpg")));
     }
 
     public static Process createProcess() throws Exception {
