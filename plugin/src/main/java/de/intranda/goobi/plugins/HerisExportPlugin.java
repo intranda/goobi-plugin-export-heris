@@ -414,7 +414,7 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
 
         String pubkeyAcceptedAlgorithms = config.getString("/sftp/pubkeyAcceptedAlgorithms");
         if (pubkeyAcceptedAlgorithms != null) {
-            sftpConfig.put("pubkeyAcceptedAlgorithms", pubkeyAcceptedAlgorithms);
+            sftpConfig.put("PubkeyAcceptedAlgorithms", pubkeyAcceptedAlgorithms);
         }
 
     }
