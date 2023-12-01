@@ -67,7 +67,7 @@
                 --add-opens java.base/java.util=ALL-UNNAMED
                 --add-opens java.base/java.lang.reflect=ALL-UNNAMED
                 --add-opens java.base/java.util.regex=ALL-UNNAMED
-                
+                 --add-opens java.base/sun.awt=ALL-UNNAMED
                 
                 
                 
