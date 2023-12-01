@@ -14,8 +14,8 @@
     <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
     <sonar.organization>intranda</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-    <sonar.java.source>11</sonar.java.source>
-    <sonar.java.target>11</sonar.java.target>
+    <sonar.java.source>17</sonar.java.source>
+    <sonar.java.target>17</sonar.java.target>
     <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <!-- Tests need to be excluded here, otherwise they would be indexed for analysis
          in the module-ci AND the parent project and this leads to an error because
@@ -51,8 +51,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.7.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>17</source>
+          <target>17</target>
         </configuration>
       </plugin>
       <plugin>
