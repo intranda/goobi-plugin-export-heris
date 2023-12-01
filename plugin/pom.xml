@@ -60,7 +60,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.12.4</version>
         <configuration>
-            <argLine>>--add-opens java.base/java.nio.file=ALL-UNNAMED</argLine>
+            <argLine>--add-opens java.base/java.nio.file=ALL-UNNAMED</argLine>
         </configuration>
       </plugin>
       <plugin>
