@@ -66,6 +66,13 @@
                 --add-opens java.base/sun.nio.fs=ALL-UNNAMED 
                 --add-opens java.base/java.util=ALL-UNNAMED
                 --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+                --add-opens java.base/java.util.regex=ALL-UNNAMED
+                
+                
+                
+                
+                
+                
             </argLine>
         </configuration>
       </plugin>
