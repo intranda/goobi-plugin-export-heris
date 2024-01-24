@@ -48,6 +48,7 @@ import org.apache.commons.lang.StringUtils;
 import org.goobi.beans.Process;
 import org.goobi.beans.Processproperty;
 import org.goobi.beans.Step;
+import org.goobi.production.enums.LogType;
 import org.goobi.production.enums.PluginType;
 import org.goobi.production.plugin.interfaces.IExportPlugin;
 import org.goobi.production.plugin.interfaces.IPlugin;
@@ -227,6 +228,13 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
                         }
                     }
                     String newImageName = image;
+
+                    if (photograph == null) {
+                        Helper.addMessageToProcessJournal(process.getId(), LogType.ERROR, "Heris export failed, unassigned pages found.");
+
+                        return false;
+                    }
+
                     for (Metadata md : photograph.getAllMetadata()) {
                         if ("shelfmarksource".equals(md.getType().getName())) {
                             newImageName = md.getValue() + ".jpg";
