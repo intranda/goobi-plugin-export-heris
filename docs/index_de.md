@@ -13,6 +13,8 @@ Mithilfe dieses Plugins für Goobi workflow können die in einem vorherigen Arbe
 ## Installation
 Um den Heris Export nutzen zu können, müssen folgende Dateien installiert werden:
 
+![Integration des Plugins in den Workflow](screen1_de.png)
+
 ```bash
 /opt/digiverso/goobi/plugins/export/plugin_intranda_export_heris-base.jar
 /opt/digiverso/goobi/config/plugin_intranda_export_heris.xml

@@ -13,6 +13,8 @@ This plugin for Goobi workflow can be used to export the images and associated m
 ## Installation
 The following files must be installed in order to use Heris Export:
 
+![Integration of the plugin into the workflow](screen1_en.png)
+
 ```bash
 /opt/digiverso/goobi/plugins/export/plugin_intranda_export_heris-base.jar
 /opt/digiverso/goobi/config/plugin_intranda_export_heris.xml
