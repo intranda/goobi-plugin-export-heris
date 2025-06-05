@@ -45,8 +45,8 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
 import org.apache.commons.lang.StringUtils;
+import org.goobi.beans.GoobiProperty;
 import org.goobi.beans.Process;
-import org.goobi.beans.Processproperty;
 import org.goobi.beans.Step;
 import org.goobi.production.enums.LogType;
 import org.goobi.production.enums.PluginType;
@@ -163,15 +163,15 @@ public class HerisExportPlugin implements IExportPlugin, IPlugin {
 
         // find the images to export
         Map<String, String> selectedImagesList = new HashMap<>();
-        Processproperty property = null;
-        for (Processproperty p : process.getEigenschaften()) {
-            if (propertyName.equals(p.getTitel())) {
+        GoobiProperty property = null;
+        for (GoobiProperty p : process.getEigenschaften()) {
+            if (propertyName.equals(p.getPropertyName())) {
                 property = p;
                 break;
             }
         }
         if (property != null) {
-            String propertyValue = property.getWert();
+            String propertyValue = property.getPropertyValue();
             log.debug("propertyValue = " + propertyValue);
             // remove { and } from both ends
             String reducedValue = propertyValue.substring(1, propertyValue.length() - 1);
