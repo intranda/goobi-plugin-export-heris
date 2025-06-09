@@ -31,8 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.easymock.EasyMock;
+import org.goobi.beans.GoobiProperty;
+import org.goobi.beans.GoobiProperty.PropertyOwnerType;
 import org.goobi.beans.Process;
-import org.goobi.beans.Processproperty;
 import org.goobi.beans.Project;
 import org.goobi.beans.ProjectFileGroup;
 import org.goobi.beans.Ruleset;
@@ -165,11 +166,11 @@ public class HerisExportPluginTest {
         testProcess.setTitel("testprocess");
         testProcess.setId(1);
 
-        Processproperty prop = new Processproperty();
-        prop.setTitel("plugin_intranda_step_image_selection");
-        prop.setWert(
+        GoobiProperty prop = new GoobiProperty(PropertyOwnerType.PROCESS);
+        prop.setPropertyName("plugin_intranda_step_image_selection");
+        prop.setPropertyValue(
                 "{\"Sammelmappe1.pdf_Seite_008.tif\":1,\"Sammelmappe1.pdf_Seite_009.tif\":2,\"Sammelmappe1.pdf_Seite_011.tif\":3,\"Sammelmappe1.pdf_Seite_010.tif\":4,\"Sammelmappe1.pdf_Seite_007.tif\":5}");
-        List<Processproperty> props = new ArrayList<>();
+        List<GoobiProperty> props = new ArrayList<>();
         props.add(prop);
         testProcess.setEigenschaften(props);
 
