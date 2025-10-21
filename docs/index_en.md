@@ -3,6 +3,10 @@ title: Heris Export
 identifier: intranda_export_heris
 published: true
 description: This is a technical documentation for the Heris Export Plugin. It enables the export of selected images and their associated metadata to an SFTP server.
+keywords:
+    - Goobi workflow
+    - Plugin
+    - Export Plugin
 ---
 ## Introduction
 This documentation describes the installation, configuration and use of the Heris export plugin in Goobi.
